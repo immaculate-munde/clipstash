@@ -1,0 +1,68 @@
+<svg width="500" height="294" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+      @keyframes pop { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
+      @keyframes wiggle { 0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(2deg)} }
+      .board { animation: pop 0.5s ease both; }
+      .clip  { animation: bounce 2.2s ease-in-out infinite; transform-origin: 340px 108px; }
+      .line1 { animation: pop 0.5s 0.15s ease both; }
+      .line2 { animation: pop 0.5s 0.25s ease both; }
+      .line3 { animation: pop 0.5s 0.35s ease both; }
+      .star1 { animation: wiggle 1.8s ease-in-out infinite; transform-origin: 222px 148px; }
+      .star2 { animation: wiggle 2.1s ease-in-out infinite 0.4s; transform-origin: 480px 200px; }
+      .star3 { animation: wiggle 1.6s ease-in-out infinite 0.2s; transform-origin: 200px 260px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="680" height="400" fill="#0d0d10" rx="24"/>
+
+  <!-- Background dots -->
+  <circle cx="160" cy="120" r="5" fill="#4f8ef7" opacity="0.25"/>
+  <circle cx="520" cy="140" r="7" fill="#f7a26a" opacity="0.25"/>
+  <circle cx="140" cy="300" r="4" fill="#4fcf8e" opacity="0.25"/>
+  <circle cx="540" cy="310" r="6" fill="#4f8ef7" opacity="0.25"/>
+  <circle cx="200" cy="370" r="3" fill="#f7a26a" opacity="0.2"/>
+  <circle cx="490" cy="360" r="4" fill="#4fcf8e" opacity="0.2"/>
+
+  <!-- Stars -->
+  <text x="222" y="155" text-anchor="middle" font-size="20" fill="#f7b84f" opacity="0.85">✦</text>
+  <text x="480" y="207" text-anchor="middle" font-size="16" fill="#4fcf8e" opacity="0.75">✦</text>
+  <text x="200" y="267" text-anchor="middle" font-size="12" fill="#f76e6e" opacity="0.65">✦</text>
+
+  <!-- Clipboard shadow -->
+  <rect x="268" y="148" width="160" height="190" rx="16" fill="#000" opacity="0.3"/>
+  <!-- Clipboard body -->
+  <rect x="262" y="142" width="160" height="190" rx="16" fill="#1a1a2e"/>
+  <rect x="262" y="142" width="160" height="190" rx="16" fill="none" stroke="#4f8ef7" stroke-width="2.5" opacity="0.6"/>
+
+  <!-- Paper -->
+  <rect x="274" y="162" width="136" height="158" rx="9" fill="#ffffff" opacity="0.96"/>
+  <rect x="274" y="162" width="136" height="158" rx="9" fill="none" stroke="#e0e0f0" stroke-width="1"/>
+
+  <!-- Lines on paper -->
+  <rect x="288" y="188" width="90" height="7" rx="3.5" fill="#4f8ef7" opacity="0.75"/>
+  <rect x="288" y="206" width="64" height="7" rx="3.5" fill="#4f8ef7" opacity="0.45"/>
+  <rect x="358" y="206" width="36" height="7" rx="3.5" fill="#f7b84f" opacity="0.55"/>
+  <rect x="288" y="224" width="78" height="7" rx="3.5" fill="#4f8ef7" opacity="0.35"/>
+
+  <!-- Checkboxes -->
+  <rect x="288" y="244" width="12" height="12" rx="3" fill="none" stroke="#4f8ef7" stroke-width="1.5" opacity="0.6"/>
+  <path d="M290 250 L292 253 L297 247" fill="none" stroke="#4fcf8e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="288" y="263" width="12" height="12" rx="3" fill="none" stroke="#4f8ef7" stroke-width="1.5" opacity="0.6"/>
+  <path d="M290 269 L292 272 L297 266" fill="none" stroke="#4fcf8e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="288" y="282" width="12" height="12" rx="3" fill="none" stroke="#5a5a78" stroke-width="1.5" opacity="0.5"/>
+  <rect x="308" y="247" width="72" height="6" rx="3" fill="#5a5a78" opacity="0.5"/>
+  <rect x="308" y="266" width="55" height="6" rx="3" fill="#5a5a78" opacity="0.5"/>
+  <rect x="308" y="285" width="65" height="6" rx="3" fill="#3a3a50" opacity="0.5"/>
+
+  <!-- Clip (top) -->
+  <rect x="312" y="108" width="60" height="52" rx="6" fill="#4f8ef7"/>
+  <rect x="318" y="114" width="48" height="30" rx="4" fill="none" stroke="#0d0d10" stroke-width="3"/>
+  <rect x="326" y="130" width="32" height="12" rx="2" fill="#0d0d10" opacity="0.25"/>
+
+  <!-- Wordmark -->
+  <text x="340" y="368" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-1" fill="#eeeef5">Clip<tspan fill="#4f8ef7">stash</tspan></text>
+  <text x="340" y="390" text-anchor="middle" font-family="monospace" font-size="11" letter-spacing="3" fill="#9898b0">COPY · SYNC · ANYWHERE</text>
+</svg>
