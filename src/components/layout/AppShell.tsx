@@ -4,17 +4,17 @@ import { useState, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { ActiveView } from '@/types'
-import { useTheme  } from '@/hooks/useTheme'
-import { useToast  } from '@/hooks/useToast'
+import { useTheme   } from '@/hooks/useTheme'
+import { useToast   } from '@/hooks/useToast'
 
-import { Topbar          } from './Topbar'
-import { Sidebar         } from './Sidebar'
-import { Footer          } from './Footer'
-import { ToastContainer  } from '@/components/ui/Toast'
-import { AuthView        } from '@/components/auth/AuthView'
-import { MyClipsView     } from '@/components/clips/MyClipsView'
-import { GuestView       } from '@/components/clips/GuestView'
-import { SettingsView    } from '@/components/clips/SettingsView'
+import { Topbar         } from './Topbar'
+import { Sidebar        } from './Sidebar'
+import { Footer         } from './Footer'
+import { ToastContainer } from '@/components/ui/Toast'
+import { AuthView       } from '@/components/auth/AuthView'
+import { MyClipsView    } from '@/components/clips/MyClipsView'
+import { GuestView      } from '@/components/clips/GuestView'
+import { SettingsView   } from '@/components/clips/SettingsView'
 import { copyToClipboard } from '@/lib/utils'
 
 export function AppShell() {
@@ -29,15 +29,20 @@ export function AppShell() {
 
   // ── Auth listener + URL code ─────────────────────────────
   useEffect(() => {
+    // Safe — this only runs in the browser (useEffect never runs on server)
     const params = new URLSearchParams(window.location.search)
     const urlCode = params.get('code')?.toUpperCase() ?? null
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    // Supabase OAuth callback uses 'code' param too — ignore if it looks like OAuth
+    // OAuth codes are long tokens; session codes are exactly 6 chars
+    const isSessionCode = urlCode && urlCode.length === 6 && /^[A-Z0-9]{6}$/.test(urlCode)
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null
       setUser(u)
       if (u) {
         setActiveView('my-clips')
-      } else if (urlCode && urlCode.length === 6) {
+      } else if (isSessionCode) {
         setGuestCode(urlCode)
         setActiveView('guest')
       } else {
@@ -45,9 +50,12 @@ export function AppShell() {
       }
       setReady(true)
     })
+
+    // Cleanup subscription on unmount
+    return () => subscription.unsubscribe()
   }, [])
 
-  // ── Keyboard shortcut: Cmd/Ctrl+K to focus textarea ──────
+  // ── Keyboard shortcut: Cmd/Ctrl+K ────────────────────────
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -65,14 +73,14 @@ export function AppShell() {
     toast(ok ? 'Code copied!' : `Code: ${guestCode}`, ok ? 'success' : 'info')
   }
 
-  // ── Loading Screen ───────────────────────────────────────
+  // ── Loading screen ───────────────────────────────────────
   if (!ready) {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-[var(--bg)] gap-4">
-        <img 
-          src="/clipstash-logo.svg" 
-          alt="Loading Clipstash" 
-          className="w-12 h-12 object-contain animate-pulse" 
+        <img
+          src="/clipstash-logo.svg"
+          alt="Loading Clipstash"
+          className="w-12 h-12 object-contain animate-pulse"
         />
         <p className="font-mono text-sm text-[var(--text3)]">loading clipstash…</p>
       </div>
@@ -83,7 +91,6 @@ export function AppShell() {
     <>
       <div className="flex flex-col min-h-screen">
 
-        {/* Topbar */}
         <Topbar
           user={user}
           theme={theme}
@@ -91,9 +98,7 @@ export function AppShell() {
           onNavigate={setActiveView}
         />
 
-        {/* Body — sidebar + main content */}
         <div className="flex flex-1 max-w-[1200px] w-full mx-auto">
-
           <Sidebar
             user={user}
             activeView={activeView}
@@ -143,9 +148,7 @@ export function AppShell() {
           </main>
         </div>
 
-        {/* Footer — outside the body row so it sits below everything */}
         <Footer />
-
       </div>
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
