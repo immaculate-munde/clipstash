@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useGuestClips } from '@/hooks/useClips'
 import { genSessionCode, copyToClipboard } from '@/lib/utils'
 import { AddClipForm   } from '@/components/clips/AddClipForm'
@@ -8,8 +9,13 @@ import { ClipsList     } from '@/components/clips/ClipsList'
 import { Button        } from '@/components/ui/Button'
 import { Card          } from '@/components/ui/Card'
 import { AboutSection  } from '@/components/layout/AboutSection'
-import { QRScanner     } from '@/components/clips/QRScanner'
 import { QRCodeDisplay } from '@/components/clips/QRCodeDisplay'
+
+// ── Dynamically import QRScanner (uses browser camera API — no SSR) ──
+const QRScanner = dynamic(
+  () => import('@/components/clips/QRScanner').then(m => m.QRScanner),
+  { ssr: false, loading: () => null }
+)
 
 interface GuestViewProps {
   initialCode?: string | null
@@ -25,7 +31,6 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
 
   const { clips, loading, load, add, remove, clearAll } = useGuestClips(sessionCode)
 
-  // Load clips when session starts
   useEffect(() => {
     if (sessionCode) load()
   }, [sessionCode, load])
@@ -35,9 +40,7 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
     onCodeChange(code)
   }
 
-  function handleCreate() {
-    activate(genSessionCode())
-  }
+  function handleCreate() { activate(genSessionCode()) }
 
   function handleJoin() {
     const code = joinInput.trim().toUpperCase()
@@ -75,39 +78,25 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
   }
 
   async function handleAdd(content: string) {
-    try {
-      await add(content)
-      onToast('Clip added ✓', 'success')
-    } catch (e: any) {
-      onToast(e.message ?? 'Failed to save', 'error')
-    }
+    try { await add(content); onToast('Clip added ✓', 'success') }
+    catch (e: any) { onToast(e.message ?? 'Failed to save', 'error') }
   }
 
   async function handleDelete(id: string) {
-    try {
-      await remove(id)
-      onToast('Deleted', 'info')
-    } catch {
-      onToast('Delete failed', 'error')
-    }
+    try { await remove(id); onToast('Deleted', 'info') }
+    catch { onToast('Delete failed', 'error') }
   }
 
   async function handleClearAll() {
     if (!confirm('Clear ALL clips in this session?')) return
-    try {
-      await clearAll()
-      onToast('Session cleared', 'info')
-    } catch {
-      onToast('Clear failed', 'error')
-    }
+    try { await clearAll(); onToast('Session cleared', 'info') }
+    catch { onToast('Clear failed', 'error') }
   }
 
   // ── No active session ────────────────────────────────────
   if (!sessionCode) {
     return (
       <div className="animate-fade-in">
-
-        {/* QR Scanner modal */}
         {showScanner && (
           <QRScanner
             onScan={handleQRScan}
@@ -123,18 +112,14 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          {/* New session */}
           <Card>
             <p className="font-bold text-base mb-1">🆕 New Session</p>
             <p className="text-sm text-[var(--text2)] mb-4 leading-relaxed">
               Generate a fresh code and start a shared clipboard instantly.
             </p>
-            <Button fullWidth onClick={handleCreate}>
-              Generate Code
-            </Button>
+            <Button fullWidth onClick={handleCreate}>Generate Code</Button>
           </Card>
 
-          {/* Join by code */}
           <Card>
             <p className="font-bold text-base mb-1">🔑 Join by Code</p>
             <p className="text-sm text-[var(--text2)] mb-3 leading-relaxed">
@@ -161,7 +146,6 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
           </Card>
         </div>
 
-        {/* Scan QR — full width */}
         <Card>
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
@@ -182,8 +166,6 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
   // ── Active session ───────────────────────────────────────
   return (
     <div className="animate-fade-in">
-
-      {/* QR Scanner modal */}
       {showScanner && (
         <QRScanner
           onScan={handleQRScan}
@@ -191,7 +173,6 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
         />
       )}
 
-      {/* Code hero banner */}
       <div className="rounded-2xl border border-[rgba(79,142,247,0.2)] p-6 mb-6 bg-gradient-to-br from-[var(--accent-bg)] to-transparent">
         <p className="font-mono text-[11px] text-[var(--text3)] uppercase tracking-[2px] mb-2">
           your session code
@@ -203,20 +184,15 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
           Open Clipstash on any device and enter this code — or scan the QR below
         </p>
 
-        {/* Action buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           <Button variant="secondary" size="sm" onClick={handleCopyCode}>📋 Copy Code</Button>
           <Button variant="secondary" size="sm" onClick={handleShareLink}>🔗 Share Link</Button>
-          <Button
-            variant="secondary" size="sm"
-            onClick={() => setShowQR(v => !v)}
-          >
+          <Button variant="secondary" size="sm" onClick={() => setShowQR(v => !v)}>
             {showQR ? '🙈 Hide QR' : '📷 Show QR'}
           </Button>
           <Button variant="ghost" size="sm" onClick={handleLeave}>✕ Leave</Button>
         </div>
 
-        {/* QR Code (toggle) */}
         {showQR && (
           <div className="mt-5 flex justify-center animate-fade-in">
             <QRCodeDisplay
@@ -227,10 +203,8 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
         )}
       </div>
 
-      {/* Add clip */}
       <AddClipForm onAdd={handleAdd} showLabel={false} />
 
-      {/* Clips list */}
       <ClipsList
         clips={clips}
         loading={loading}
@@ -246,7 +220,6 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
           </div>
         }
       />
-
       <AboutSection />
     </div>
   )
