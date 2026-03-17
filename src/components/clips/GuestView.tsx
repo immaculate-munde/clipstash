@@ -3,10 +3,13 @@
 import { useState, useEffect } from 'react'
 import { useGuestClips } from '@/hooks/useClips'
 import { genSessionCode, copyToClipboard } from '@/lib/utils'
-import { AddClipForm } from '@/components/clips/AddClipForm'
-import { ClipsList   } from '@/components/clips/ClipsList'
-import { Button      } from '@/components/ui/Button'
-import { Card        } from '@/components/ui/Card'
+import { AddClipForm   } from '@/components/clips/AddClipForm'
+import { ClipsList     } from '@/components/clips/ClipsList'
+import { Button        } from '@/components/ui/Button'
+import { Card          } from '@/components/ui/Card'
+import { AboutSection  } from '@/components/layout/AboutSection'
+import { QRScanner     } from '@/components/clips/QRScanner'
+import { QRCodeDisplay } from '@/components/clips/QRCodeDisplay'
 
 interface GuestViewProps {
   initialCode?: string | null
@@ -17,6 +20,8 @@ interface GuestViewProps {
 export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps) {
   const [sessionCode, setSessionCode] = useState<string | null>(initialCode ?? null)
   const [joinInput,   setJoinInput]   = useState('')
+  const [showScanner, setShowScanner] = useState(false)
+  const [showQR,      setShowQR]      = useState(false)
 
   const { clips, loading, load, add, remove, clearAll } = useGuestClips(sessionCode)
 
@@ -40,10 +45,17 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
     activate(code)
   }
 
+  function handleQRScan(code: string) {
+    setShowScanner(false)
+    activate(code)
+    onToast(`Joined session ${code} via QR! 📱`, 'success')
+  }
+
   function handleLeave() {
     setSessionCode(null)
     onCodeChange(null)
     setJoinInput('')
+    setShowQR(false)
   }
 
   async function handleCopyCode() {
@@ -94,6 +106,15 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
   if (!sessionCode) {
     return (
       <div className="animate-fade-in">
+
+        {/* QR Scanner modal */}
+        {showScanner && (
+          <QRScanner
+            onScan={handleQRScan}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
+
         <div className="mb-6">
           <h1 className="text-2xl font-extrabold tracking-tight">Guest Clipboard</h1>
           <p className="text-sm text-[var(--text2)] mt-1">
@@ -101,7 +122,7 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           {/* New session */}
           <Card>
             <p className="font-bold text-base mb-1">🆕 New Session</p>
@@ -113,9 +134,9 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
             </Button>
           </Card>
 
-          {/* Join session */}
+          {/* Join by code */}
           <Card>
-            <p className="font-bold text-base mb-1">🔑 Join Session</p>
+            <p className="font-bold text-base mb-1">🔑 Join by Code</p>
             <p className="text-sm text-[var(--text2)] mb-3 leading-relaxed">
               Enter a code from another device to sync.
             </p>
@@ -139,6 +160,21 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
             </div>
           </Card>
         </div>
+
+        {/* Scan QR — full width */}
+        <Card>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <p className="font-bold text-base mb-1">📷 Scan QR Code</p>
+              <p className="text-sm text-[var(--text2)]">
+                Point your camera at a Clipstash session QR code to join instantly.
+              </p>
+            </div>
+            <Button variant="secondary" onClick={() => setShowScanner(true)}>
+              Open Scanner
+            </Button>
+          </div>
+        </Card>
       </div>
     )
   }
@@ -146,33 +182,55 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
   // ── Active session ───────────────────────────────────────
   return (
     <div className="animate-fade-in">
+
+      {/* QR Scanner modal */}
+      {showScanner && (
+        <QRScanner
+          onScan={handleQRScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
       {/* Code hero banner */}
-      <div
-        className="
-          rounded-2xl border border-[rgba(79,142,247,0.2)] p-6 text-center mb-6
-          bg-gradient-to-br from-[var(--accent-bg)] to-transparent
-        "
-      >
+      <div className="rounded-2xl border border-[rgba(79,142,247,0.2)] p-6 mb-6 bg-gradient-to-br from-[var(--accent-bg)] to-transparent">
         <p className="font-mono text-[11px] text-[var(--text3)] uppercase tracking-[2px] mb-2">
           your session code
         </p>
         <p className="font-mono text-4xl font-bold text-[var(--accent)] tracking-[12px] mb-2">
           {sessionCode}
         </p>
-        <p className="text-sm text-[var(--text2)] mb-4">
-          Open Clipstash on any device and enter this code to sync
+        <p className="text-sm text-[var(--text2)] mb-5">
+          Open Clipstash on any device and enter this code — or scan the QR below
         </p>
-        <div className="flex items-center justify-center gap-2 flex-wrap">
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
           <Button variant="secondary" size="sm" onClick={handleCopyCode}>📋 Copy Code</Button>
           <Button variant="secondary" size="sm" onClick={handleShareLink}>🔗 Share Link</Button>
-          <Button variant="ghost"     size="sm" onClick={handleLeave}>✕ Leave</Button>
+          <Button
+            variant="secondary" size="sm"
+            onClick={() => setShowQR(v => !v)}
+          >
+            {showQR ? '🙈 Hide QR' : '📷 Show QR'}
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleLeave}>✕ Leave</Button>
         </div>
+
+        {/* QR Code (toggle) */}
+        {showQR && (
+          <div className="mt-5 flex justify-center animate-fade-in">
+            <QRCodeDisplay
+              sessionCode={sessionCode}
+              onClose={() => setShowQR(false)}
+            />
+          </div>
+        )}
       </div>
 
       {/* Add clip */}
       <AddClipForm onAdd={handleAdd} showLabel={false} />
 
-      {/* List */}
+      {/* Clips list */}
       <ClipsList
         clips={clips}
         loading={loading}
@@ -188,6 +246,8 @@ export function GuestView({ initialCode, onCodeChange, onToast }: GuestViewProps
           </div>
         }
       />
+
+      <AboutSection />
     </div>
   )
 }

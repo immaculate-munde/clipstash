@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 export function Footer() {
     const year = new Date().getFullYear()
   
@@ -24,15 +26,13 @@ export function Footer() {
             {/* Quick Links */}
             <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-[var(--text2)]">
               {/* Add your actual GitHub repo link here if it's open source */}
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">
+              <a href="https://github.com/immaculate-munde" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent)] transition-colors">
                 GitHub
               </a>
-              <a href="#" className="hover:text-[var(--accent)] transition-colors">
+              
+              <Link href="/privacy" className="hover:text-[var(--accent)] transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="hover:text-[var(--accent)] transition-colors">
-                Terms of Service
-              </a>
+              </Link>
             </div>
           </div>
   
@@ -41,7 +41,7 @@ export function Footer() {
             <span>© {year} Clipstash. All rights reserved.</span>
   
             <span className="flex items-center gap-1.5">
-              Built with ⚡ by{' '}
+              An{' '}
               <a
                 href="https://mundeimmaculate.vercel.app"
                 target="_blank"
@@ -55,6 +55,7 @@ export function Footer() {
               >
                 Immaculate Munde
               </a>
+              Creation
             </span>
           </div>
         </div>

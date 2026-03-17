@@ -6,6 +6,7 @@ import { useMyClips } from '@/hooks/useClips'
 import { AddClipForm } from '@/components/clips/AddClipForm'
 import { ClipsList   } from '@/components/clips/ClipsList'
 import { StatsRow    } from '@/components/clips/StatsRow'
+import { AboutSection } from '@/components/layout/AboutSection'
 
 interface MyClipsViewProps {
   user:    User
@@ -62,6 +63,8 @@ export function MyClipsView({ user, onToast }: MyClipsViewProps) {
         emptyTitle="No clips yet"
         emptySubtitle="Add your first clip above — it'll sync across every device you sign into."
       />
+
+      <AboutSection />
     </div>
   )
 }

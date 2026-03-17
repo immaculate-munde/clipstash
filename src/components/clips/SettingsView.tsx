@@ -6,6 +6,7 @@ import { signOut } from '@/lib/supabase'
 import { Button  } from '@/components/ui/Button'
 import { Card    } from '@/components/ui/Card'
 import { Divider } from '@/components/ui/Misc'
+import { AboutSection } from '@/components/layout/AboutSection'
 
 interface SettingsViewProps {
   user:          User
@@ -71,15 +72,7 @@ export function SettingsView({ user, theme, onToggleTheme, onSignedOut, onToast 
         </div>
       </Card>
 
-      {/* SQL setup reminder */}
-      <div className="mt-6 p-4 bg-[var(--amber-bg)] border border-[var(--amber)] border-opacity-30 rounded-xl">
-        <p className="text-xs font-bold text-[var(--amber)] font-mono uppercase tracking-wider mb-1">
-          ⚠ Supabase Setup
-        </p>
-        <p className="text-xs text-[var(--text2)] leading-relaxed">
-          Make sure you've run the SQL migration in your Supabase dashboard to create the <code className="font-mono bg-[var(--surface2)] px-1 rounded">clips</code> table and RLS policies.
-        </p>
-      </div>
+      <AboutSection />
     </div>
   )
 }
